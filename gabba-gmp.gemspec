@@ -2,7 +2,7 @@
 require File.expand_path '../lib/gabba-gmp/version', __FILE__
 
 Gem::Specification.new do |s|
-  s.name        = "gabba"
+  s.name        = "gabba-gmp"
   s.version     = GabbaGMP::VERSION
   s.platform    = Gem::Platform::RUBY
   s.authors     = ["Julian West"]
