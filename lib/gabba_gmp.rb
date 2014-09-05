@@ -1,1 +1,1 @@
-require 'gabba_gmp/gabba_gmp'
+require 'gabba-gmp/gabba_gmp'
