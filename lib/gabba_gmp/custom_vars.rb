@@ -16,7 +16,7 @@ module GabbaGMP
       def set_custom_var(index, name, value)
         raise "Index must be between 1 and 50" unless (1..50).include?(index)
         
-        @sessionopts["cm#{index}".to_sym] = value
+        @sessionopts["cd#{index}".to_sym] = value
       end
     end
   end
