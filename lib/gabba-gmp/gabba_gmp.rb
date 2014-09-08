@@ -61,13 +61,20 @@ module GabbaGMP
                       document_host: request.host, 
                       client_id: cookies[client_id_cookie], 
                       user_ip_address: request.remote_ip, 
-                      user_agent: request.env["HTTP_USER_AGENT"]}
+                      user_agent: request.user_agent,
+                      user_language: preferred_language(request.accept_language)}
         
-      @sessionopts[:document_referrer] = request.env["HTTP_REFERER"] if request.env["HTTP_REFERER"].present?
+      @sessionopts[:document_referrer] = request.referrer if request.referrer.present?
         
       debug = false
     end
 
+    def preferred_language(language)
+      return "" unless language.present?
+      
+      language_arr = language.split(",").map {|lang_pref| lang_pref.split(";")}
+      language_arr[0][0] #just get the first language. Will probably be correct.
+    end
 
     # Public: Set the session's parameters. This will be added to all actions that are sent to analytics.
     #  

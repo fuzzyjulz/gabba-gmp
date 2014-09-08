@@ -74,7 +74,7 @@ gabba.campaign = campaign
 
 ```
 
-### Manually setting paramters
+### Manually setting parameters
 
 If you find that you absolutely must override variables that are used internally then you can override the session parameters:
 

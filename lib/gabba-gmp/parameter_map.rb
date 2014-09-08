@@ -6,9 +6,14 @@ module GabbaGMP
         protocol_version: :v,
         tracking_id: :tid,
 
-        user_ip_address: :uip,
         client_id: :cid,
+        user_id: :uid,                #currently untested
+        user_ip_address: :uip,
         user_agent: :ua,
+        user_language: :ul,
+        user_screen_resolution: :sr,  #currently untested
+        user_viewport_size: :vp,      #currently untested
+        user_screen_colors: :sd,      #currently untested
 
         hit_type: :t,
         
