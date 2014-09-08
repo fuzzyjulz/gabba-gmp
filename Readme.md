@@ -13,8 +13,6 @@ Refactored from the [gabba](https://github.com/hybridgroup/gabba) project.
 ### Track page views
 
 ```ruby
-google_tracker_id = "UT-1234"
-
 gabba = GabbaGMP::GabbaGMP.new("UT-1234", request, cookies)
 
 gabba.page_view(request)
@@ -47,7 +45,6 @@ gabba.event("Videos", "Play", "ID", "123")
 # Index: 1 through 200 (for pro or 20 for free)
 index = 1
 
-# Set var
 gabba.set_custom_var(index, 'Name', 'Value')
 
 # Track the event (all vars will be included)
@@ -77,6 +74,23 @@ gabba.campaign = campaign
 
 ```
 
+### Manually setting paramters
+
+If you find that you absolutely must override variables that are used internally then you can override the session parameters:
+
+```ruby
+gabba = GabbaGMP::GabbaGMP.new("UT-1234", request, cookies)
+
+#Manually override the user agent so that we can detect local calls in GA! 
+gabba.add_options(user_agent: "LocalUse") if request.remote_ip == "127.0.0.1"
+
+#This pageview has the new user agent! (if you are accessing from localhost)
+gabba.page_view(request)
+
+#This event also has the user agent! Easy as!
+gabba.event("Videos", "Play", "ID", "123")
+
+```
 
 ### License
 

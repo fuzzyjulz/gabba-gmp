@@ -63,6 +63,8 @@ module GabbaGMP
                       user_ip_address: request.remote_ip, 
                       user_agent: request.env["HTTP_USER_AGENT"]}
         
+      @sessionopts[:document_referrer] = request.env["HTTP_REFERER"] if request.env["HTTP_REFERER"].present?
+        
       debug = false
     end
 
