@@ -8,8 +8,8 @@ Gem::Specification.new do |s|
   s.authors     = ["Julian West"]
   s.email       = ["julz dot west at gmail dot com"]
   s.homepage    = "https://github.com/fuzzyjulz/gabba-gmp"
-  s.summary     = %q{Easy server-side tracking for Google Analytics}
-  s.description = %q{Easy server-side tracking for Google Analytics}
+  s.summary     = %q{Google Measurement Protocol rewite of the Gabba library}
+  s.description = %q{Google Measurement Protocol rewite of the Gabba library}
   s.license = "MIT"
 
   s.rubyforge_project = "gabba-gmp"

@@ -5,6 +5,7 @@ require 'ipaddr'
 require 'cgi'
 require 'net/http/persistent'
 
+require "#{File.dirname(__FILE__)}/parameter_map"
 require "#{File.dirname(__FILE__)}/campaign"
 require "#{File.dirname(__FILE__)}/custom_vars"
 require "#{File.dirname(__FILE__)}/event"
@@ -13,6 +14,9 @@ require "#{File.dirname(__FILE__)}/version"
 
 module GabbaGMP
 
+  class GoogleAnalyticsInvalidParameterError < RuntimeError; end
+  class GoogleAnalyticsRequiredParameterMissingError < RuntimeError; end
+  class GoogleAnalyticsParameterNotFoundError < RuntimeError; end
   class NoGoogleAnalyticsAccountError < RuntimeError; end
   class NoGoogleAnalyticsDomainError < RuntimeError; end
   class GoogleAnalyticsNetworkError < RuntimeError; end
@@ -22,6 +26,7 @@ module GabbaGMP
     BEACON_PATH = "/collect"
     USER_AGENT = "Gabba GMP #{VERSION} Agent"
 
+    include ParameterMap
     include CustomVars
     include Event
     include PageView
@@ -42,60 +47,81 @@ module GabbaGMP
     #
     #   g = GabbaGMP::GabbaGMP.new("UT-1234", "mydomain.com")
     #
-    def initialize(ga_acct, domain, visitor_uuid, client_ip, agent = nil)
-      agent =  agent.present? ? agent : GabbaGMP::USER_AGENT
+    def initialize(ga_tracking_id, request, cookies, options = {})
+      client_id_cookie = options[:client_id_cookie_sym]
+      client_id_cookie = :utm_visitor_uuid if !client_id_cookie.present? or !client_id_cookie.kind_of? Symbol
       
-      @sessionopts = {v: 1, tid: ga_acct.to_s, dh: domain.to_s, cid: visitor_uuid.to_s, uip: client_ip.to_s, ua: agent.to_s}
+      if !cookies[client_id_cookie].present?
+        cookie_expiry = options[:client_id_cookie_expiry] ? options[:client_id_cookie_expiry] : 1.year.from_now
+        cookies[client_id_cookie] = { value: "#{SecureRandom.uuid}", expires: cookie_expiry}
+      end
+      
+      @sessionopts = {protocol_version: 1, 
+                      tracking_id: ga_tracking_id, 
+                      document_host: request.host, 
+                      client_id: cookies[client_id_cookie], 
+                      user_ip_address: request.remote_ip, 
+                      user_agent: request.env["HTTP_USER_AGENT"]}
         
       debug = false
     end
 
 
-    # Public: provide the utmr attribute, allowing for referral tracking
-    #
-    # Called before page_view etc
-    #
-    # Examples:
-    #   g.referer(request.env['HTTP_REFERER'])
-    #   g.page_view("something", "track/me")
-    #
-    def referer(referrer)
-      @sessionopts[:dr] = referrer
+    # Public: Set the session's parameters. This will be added to all actions that are sent to analytics.
+    #  
+    #  See::  ParameterMap:GA_PARAMS
+    def add_options(options)
+      options.keys.each do |key| 
+        raise GoogleAnalyticsParameterNotFoundError, "Parameter '#{key}'" unless GA_PARAMS[key].present?
+      end
+      
+      @sessionopts.merge!(options)
       self
     end
 
+    # Public: Set the campaign details from a campaign object. You can also use your own Campaign object so long
+    #  as they support the 5 methods (name, source, medium, keyword, content)
     def campaign=(campaign)
       campaign ||= Campaign.new
       {}.tap do |campaign_params|
-        @sessionopts[:cn] = campaign.name
-        @sessionopts[:cn] ||= "(direct)"
+        @sessionopts[:campaign_name] = campaign.name
+        @sessionopts[:campaign_name] ||= "(direct)"
           
-        @sessionopts[:cs] = campaign.source
-        @sessionopts[:cs] ||= "(direct)"
+        @sessionopts[:campaign_source] = campaign.source
+        @sessionopts[:campaign_source] ||= "(direct)"
           
-        @sessionopts[:cm] = campaign.medium
-        @sessionopts[:cm] ||= "(none)"
+        @sessionopts[:campaign_medium] = campaign.medium
+        @sessionopts[:campaign_medium] ||= "(none)"
           
-        @sessionopts[:ck] = campaign.keyword if campaign.keyword.present?
+        @sessionopts[:campaign_keyword] = campaign.keyword if campaign.keyword.present?
           
-        @sessionopts[:cc] = campaign.content if campaign.content.present?
+        @sessionopts[:campaign_content] = campaign.content if campaign.content.present?
       end
     end
     
-    # sanity check that we have needed params to even call GA
-    def check_account_params
+    # Sanity check that we have needed params to even call GA
+    def validate_session_parameters(params)
+      raise GoogleAnalyticsRequiredParameterMissingError, "Protocol version is required" unless params[:protocol_version].present?
+      raise GoogleAnalyticsRequiredParameterMissingError, "Tracking id is required" unless params[:tracking_id].present?
+      raise GoogleAnalyticsRequiredParameterMissingError, "Client id is required" unless params[:client_id].present?
+      raise GoogleAnalyticsRequiredParameterMissingError, "Hit type is required" unless params[:hit_type].present?
+      
+      params.keys.each do |param|
+        raise GoogleAnalyticsInvalidParameterError, "The parameter '#{param}' is not currently recognised." unless GA_PARAMS[param].present?
+      end
     end
 
     # makes the tracking call to Google Analytics
     def hey(params)
-      query = params.map {|k,v| "#{k}=#{URI.escape(v.to_s, Regexp.new("[^#{URI::PATTERN::UNRESERVED}]"))}" }.join('&')
+      validate_session_parameters(params)
+      query = params.map {|k,v| "#{GA_PARAMS[k]}=#{URI.escape("#{v}", Regexp.new("[^#{URI::PATTERN::UNRESERVED}]"))}" }.join('&')
 
       @http ||= Net::HTTP::Persistent.new 'GabbaGMP'
 
       Rails.logger.info "GABBA_GMP: request params: #{query}" if debug
       
       request = Net::HTTP::Get.new("#{BEACON_PATH}?#{query}")
-      request["User-Agent"] = URI.escape(params[:ua])
+      request["User-Agent"] = URI.escape(params[:user_agent])
       request["Accept"] = "*/*"
       uri = URI "http://#{GOOGLE_HOST}/#{BEACON_PATH}"
       response = @http.request(uri, request)

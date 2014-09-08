@@ -3,26 +3,27 @@ module GabbaGMP
     module PageView
       # Public: Record a page view in Google Analytics
       #
-      # title   - String with the page title for thr page view
-      # page    - String with the path for the page view
+      # request:: String with the path for the page view
+      # title::   Optional. String with the page title for the page view
+      # options:: Optional. Any additional parameters to send with the page view
       #
       # Example:
       #
-     #   g.page_view("page title", "page/1.html")
+      #   g.page_view(request, "page title")
       #
-      def page_view(title, page)
-        check_account_params
-        hey(page_view_params(title, page))
+      def page_view(request, title = nil, options = {})
+        
+        hey(page_view_params(title, request.fullpath, options))
       end
 
       # Public: Renders the page view params data in the format needed for GA
       # Called before actually sending the data along to GA.
-      def page_view_params(title, page)
+      def page_view_params(title, doc_path, options)
         @sessionopts.merge({
-          t: "pageview",
-          dt: title,
-          dp: page
-        })
+          hit_type: "pageview",
+          document_title: title,
+          document_path: doc_path
+        }).merge!(options)
       end
     end
   end
