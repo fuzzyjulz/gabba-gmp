@@ -73,7 +73,7 @@ module GabbaGMP
       return "" unless language.present?
       
       language_arr = language.split(",").map {|lang_pref| lang_pref.split(";")}
-      language_arr[0][0] #just get the first language. Will probably be correct.
+      language_arr[0][0].downcase #just get the first language. Will probably be correct.
     end
 
     # Public: Set the session's parameters. This will be added to all actions that are sent to analytics.
