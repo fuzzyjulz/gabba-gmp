@@ -14,21 +14,29 @@ Refactored from the [gabba](https://github.com/hybridgroup/gabba) project.
 
 ```ruby
 google_tracker_id = "UT-1234"
-host = "#{request.host}"
-cookies[:utm_visitor_uuid] = { value: "#{SecureRandom.uuid}", expires: 1.year.from_now} if !cookies[:utm_visitor_uuid].present?
-visitor_id = "#{cookies[:utm_visitor_uuid]}"
-client_ip = "#{request.remote_ip}"
-user_agent = "#{request.env["HTTP_USER_AGENT"]}"
 
-gabba = GabbaGMP::GabbaGMP.new(google_tracker_id, host, visitor_id, client_ip, user_agent)
+gabba = GabbaGMP::GabbaGMP.new("UT-1234", request, cookies)
 
-gabba.page_view("page title", "page/1.html")
+gabba.page_view(request)
+
+```
+
+You can also include the page title:
+```ruby
+gabba.page_view(request, "Page Title")
+
+```
+
+Or if you want to get really fancy you can update the parameters for the page view only..
+```ruby
+gabba.page_view(request, "Page Title", document_path: "/manually/fiddled/url")
+
 ```
 
 ### Track custom events
 
 ```ruby
-gabba = GabbaGMP::GabbaGMP.new(google_tracker_id, host, visitor_id, client_ip, user_agent)
+gabba = GabbaGMP::GabbaGMP.new("UT-1234", request, cookies)
 
 gabba.event("Videos", "Play", "ID", "123")
 ```
@@ -36,14 +44,11 @@ gabba.event("Videos", "Play", "ID", "123")
 ### Setting custom vars
 
 ```ruby
-# Index: 1 through 50
+# Index: 1 through 200 (for pro or 20 for free)
 index = 1
 
-# Scope: VISITOR, SESSION or PAGE
-scope = GabbaGMP::GabbaGMP::VISITOR
-
 # Set var
-gabba.set_custom_var(index, 'Name', 'Value', scope)
+gabba.set_custom_var(index, 'Name', 'Value')
 
 # Track the event (all vars will be included)
 gabba.event(...)
@@ -51,6 +56,27 @@ gabba.event(...)
 # Track the page view (all vars will be included)
 gabba.page_view(...)
 ```
+
+### Campaigns
+
+It's easy to track campaigns! You can either use the GabbaGMP campaign object or your own(assuming it has the magic fields)!
+
+Note that you can also send in `nil` into campaigns, and it will still work... one less check to do!
+
+```ruby
+
+campaign = GabbaGMP::Campaign()
+
+campaign.name = "GabbaCMP"
+campaign.source = "gemfile"
+campaign.medium = "email"
+campaign.keyword = nil
+campaign.content = "gems"
+
+gabba.campaign = campaign
+
+```
+
 
 ### License
 

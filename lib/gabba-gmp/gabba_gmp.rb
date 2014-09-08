@@ -37,12 +37,12 @@ module GabbaGMP
 
     # Public: Initialize Gabba Google Analytics Tracking Object.
     #
-    # ga_acct - A String containing your Google Analytics account id.
-    # domain  - A String containing which domain you want the tracking data to be logged from.
-    # visitor_uuid - a uuid to uniquely identify the user - use SecureRandom.uuid to generate
-    # client_ip - The IP address of the connected client
-    # agent   - A String containing the user agent you want the tracking to appear to be coming from.
-    #           Defaults to "Gabba 0.2 Agent" or whatever the correct version is.
+    # ga_tracking_id  - A String containing your Google Analytics account id.
+    # request         - The request this tracker relates to.
+    # cookies         - The cookies object for this request. Will be updated with the client_id cookie
+    # options         - Allows for:
+    #                           -client_id_cookie_expiry = Set the expiry of the visitor cookie manually
+    #                           -client_id_cookie_sym = The symbol to store the visitor id cookie under
     # Example:
     #
     #   g = GabbaGMP::GabbaGMP.new("UT-1234", "mydomain.com")
