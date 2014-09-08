@@ -1,6 +1,6 @@
 # Gabba-GMP
 
-
+[![Gem Version](https://badge.fury.io/rb/gabba-gmp.svg)](http://badge.fury.io/rb/gabba-gmp)
 
 Simple class to send custom server-side events to Google Analytics via Google Measurement Protocol
 https://developers.google.com/analytics/devguides/collection/protocol/v1/
