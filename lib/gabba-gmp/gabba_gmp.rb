@@ -93,18 +93,20 @@ module GabbaGMP
     def campaign=(campaign)
       campaign ||= Campaign.new
       {}.tap do |campaign_params|
-        @sessionopts[:campaign_name] = campaign.name
-        @sessionopts[:campaign_name] ||= "(direct)"
-          
-        @sessionopts[:campaign_source] = campaign.source
-        @sessionopts[:campaign_source] ||= "(direct)"
-          
-        @sessionopts[:campaign_medium] = campaign.medium
-        @sessionopts[:campaign_medium] ||= "(none)"
-          
-        @sessionopts[:campaign_keyword] = campaign.keyword if campaign.keyword.present?
-          
-        @sessionopts[:campaign_content] = campaign.content if campaign.content.present?
+        if campaign.present?
+          @sessionopts[:campaign_name] = campaign.name
+          @sessionopts[:campaign_name] ||= "(direct)"
+            
+          @sessionopts[:campaign_source] = campaign.source
+          @sessionopts[:campaign_source] ||= "(direct)"
+            
+          @sessionopts[:campaign_medium] = campaign.medium
+          @sessionopts[:campaign_medium] ||= "(none)"
+            
+          @sessionopts[:campaign_keyword] = campaign.keyword if campaign.keyword.present?
+            
+          @sessionopts[:campaign_content] = campaign.content if campaign.content.present?
+        end
       end
     end
     
