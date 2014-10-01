@@ -64,7 +64,7 @@ module GabbaGMP
                       user_agent: request.user_agent,
                       user_language: preferred_language(request.accept_language)}
         
-      @sessionopts[:document_referrer] = request.referrer if request.referrer.present?
+      @sessionopts[:document_referrer] = request.referrer if request.referrer.present? and !request.referrer.starts_with?("#{request.protocol}#{request.host_with_port}")
         
       debug = false
     end
