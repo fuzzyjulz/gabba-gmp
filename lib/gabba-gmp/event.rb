@@ -18,7 +18,8 @@ module GabbaGMP
         hey(event_params(category, action, label, value, options))
       end
 
-      # Public: Renders event params data in the format needed for GA
+      private
+      # Private: Renders event params data in the format needed for GA
       # Called before actually sending the data along to GA in GabbaGMP#event
       def event_params(category, action, label, value, event_options)
         options = {
@@ -26,8 +27,8 @@ module GabbaGMP
           event_category: category,
           event_action: action
         }
-        options[:event_label] = label if label.present?
-        options[:event_value] = value if value.present?
+        options[:event_label] = label if label
+        options[:event_value] = value if value
         @sessionopts.merge(options).merge!(event_options)
       end
     end

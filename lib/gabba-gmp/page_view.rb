@@ -16,7 +16,8 @@ module GabbaGMP
         hey(page_view_params(title, request.fullpath, options))
       end
 
-      # Public: Renders the page view params data in the format needed for GA
+      private
+      # Private: Renders the page view params data in the format needed for GA
       # Called before actually sending the data along to GA.
       def page_view_params(title, doc_path, options)
         @sessionopts.merge({

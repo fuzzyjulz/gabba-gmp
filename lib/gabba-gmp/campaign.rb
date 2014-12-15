@@ -4,7 +4,7 @@ module GabbaGMP
       attr_accessor :name, :source, :medium, :keyword, :content
       
       def present?
-        name.present? or source.present? or medium.present? or keyword.present? or content.present?
+        !name.to_s.empty? or !source.to_s.empty? or !medium.to_s.empty? or !keyword.to_s.empty? or !content.to_s.empty?
       end
     end
   end

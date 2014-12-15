@@ -14,7 +14,7 @@ module GabbaGMP
       #
       # Returns array with the custom variable data
       def set_custom_var(index, name, value)
-        raise "Index must be between 1 and #{GabbaGMP::DIMENSION_MAX}" unless (1..GabbaGMP::DIMENSION_MAX).include?(index)
+        raise GoogleAnalyticsInvalidParameterError, "Index must be between 1 and #{GabbaGMP::DIMENSION_MAX}" unless (1..GabbaGMP::DIMENSION_MAX).include?(index)
         
         @sessionopts["dimension_#{index}".to_sym] = value
       end

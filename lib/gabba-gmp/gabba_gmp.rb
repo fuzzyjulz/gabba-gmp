@@ -33,7 +33,7 @@ module GabbaGMP
 
     ESCAPES = %w{ ' ! * ) }
 
-    attr_accessor :debug
+    attr_accessor :logger
 
     # Public: Initialize Gabba Google Analytics Tracking Object.
     #
@@ -49,10 +49,10 @@ module GabbaGMP
     #
     def initialize(ga_tracking_id, request, cookies, options = {})
       client_id_cookie = options[:client_id_cookie_sym]
-      client_id_cookie = :utm_visitor_uuid if !client_id_cookie.present? or !client_id_cookie.kind_of? Symbol
+      client_id_cookie = :utm_visitor_uuid if client_id_cookie.nil? or !client_id_cookie.kind_of? Symbol
       
-      if !cookies[client_id_cookie].present?
-        cookie_expiry = options[:client_id_cookie_expiry] ? options[:client_id_cookie_expiry] : 1.year.from_now
+      if cookies[client_id_cookie].nil?
+        cookie_expiry = options[:client_id_cookie_expiry] ? options[:client_id_cookie_expiry] : Time.now + (60*60*24*365)
         cookies[client_id_cookie] = { value: "#{SecureRandom.uuid}", expires: cookie_expiry}
       end
       
@@ -64,16 +64,15 @@ module GabbaGMP
                       user_agent: request.user_agent,
                       user_language: preferred_language(request.accept_language)}
         
-      @sessionopts[:document_referrer] = request.referrer if request.referrer.present? and !request.referrer.starts_with?("#{request.protocol}#{request.host_with_port}")
+      @sessionopts[:document_referrer] = request.referrer if request.referrer and !request.referrer.start_with?("#{request.protocol}#{request.host_with_port}")
         
-      debug = false
     end
 
     def preferred_language(language)
-      return "" unless language.present?
+      return "" unless language
       
       language_arr = language.split(",").map {|lang_pref| lang_pref.split(";")}
-      language_arr[0][0].downcase #just get the first language. Will probably be correct.
+      language_arr[0][0].downcase.strip #just get the first language. Will probably be correct.
     end
 
     # Public: Set the session's parameters. This will be added to all actions that are sent to analytics.
@@ -81,7 +80,7 @@ module GabbaGMP
     #  See::  ParameterMap:GA_PARAMS
     def add_options(options)
       options.keys.each do |key| 
-        raise GoogleAnalyticsParameterNotFoundError, "Parameter '#{key}'" unless GA_PARAMS[key].present?
+        raise GoogleAnalyticsParameterNotFoundError, "Parameter '#{key}'" unless GA_PARAMS[key]
       end
       
       @sessionopts.merge!(options)
@@ -102,23 +101,27 @@ module GabbaGMP
             
           @sessionopts[:campaign_medium] = campaign.medium
           @sessionopts[:campaign_medium] ||= "(none)"
+          
+          @sessionopts.delete(:campaign_keyword)
+          @sessionopts[:campaign_keyword] = campaign.keyword if campaign.keyword
             
-          @sessionopts[:campaign_keyword] = campaign.keyword if campaign.keyword.present?
-            
-          @sessionopts[:campaign_content] = campaign.content if campaign.content.present?
+          @sessionopts.delete(:campaign_content)
+          @sessionopts[:campaign_content] = campaign.content if campaign.content
         end
       end
     end
     
+    
+    private
     # Sanity check that we have needed params to even call GA
     def validate_session_parameters(params)
-      raise GoogleAnalyticsRequiredParameterMissingError, "Protocol version is required" unless params[:protocol_version].present?
-      raise GoogleAnalyticsRequiredParameterMissingError, "Tracking id is required" unless params[:tracking_id].present?
-      raise GoogleAnalyticsRequiredParameterMissingError, "Client id is required" unless params[:client_id].present?
-      raise GoogleAnalyticsRequiredParameterMissingError, "Hit type is required" unless params[:hit_type].present?
+      raise GoogleAnalyticsRequiredParameterMissingError, "Protocol version is required" unless params[:protocol_version]
+      raise GoogleAnalyticsRequiredParameterMissingError, "Tracking id is required" unless params[:tracking_id]
+      raise GoogleAnalyticsRequiredParameterMissingError, "Client id is required" unless params[:client_id]
+      raise GoogleAnalyticsRequiredParameterMissingError, "Hit type is required" unless params[:hit_type]
       
       params.keys.each do |param|
-        raise GoogleAnalyticsInvalidParameterError, "The parameter '#{param}' is not currently recognised." unless GA_PARAMS[param].present?
+        raise GoogleAnalyticsInvalidParameterError, "The parameter '#{param}' is not currently recognised." unless GA_PARAMS[param]
       end
     end
 
@@ -129,10 +132,10 @@ module GabbaGMP
 
       @http ||= Net::HTTP::Persistent.new 'GabbaGMP'
 
-      Rails.logger.info "GABBA_GMP: request params: #{query}" if debug
+      @logger.info "GABBA_GMP: request params: #{query}" if @logger
       
       request = Net::HTTP::Get.new("#{BEACON_PATH}?#{query}")
-      request["User-Agent"] = URI.escape(params[:user_agent])
+      request["User-Agent"] = URI.escape(params[:user_agent]) if params[:user_agent] 
       request["Accept"] = "*/*"
       uri = URI "http://#{GOOGLE_HOST}/#{BEACON_PATH}"
       response = @http.request(uri, request)
