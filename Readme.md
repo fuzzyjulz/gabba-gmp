@@ -138,7 +138,7 @@ campaign_content:
 
 dimension_<1-200>: 
 
-*Untested*
+**Untested**
 
 user_screen_resolution:
 
