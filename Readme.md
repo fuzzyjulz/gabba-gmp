@@ -94,38 +94,56 @@ gabba.event("Videos", "Play", "ID", "123")
 
 ### Parameters that may be set
 
-protocol_version: 
-tracking_id: 
+protocol_version:
 
-client_id: 
-user_id: 
-user_ip_address: 
-user_agent: 
+tracking_id:
+
+client_id:
+
+user_id:
+ 
+user_ip_address:
+ 
+user_agent:
+ 
 user_language: 
 
 hit_type: 
 
-document_title: 
-document_path: 
-document_referrer: 
-document_host: 
+document_title:
 
-event_category: 
-event_action: 
-event_label: 
-event_value: 
+document_path:
 
-campaign_name: 
-campaign_source: 
-campaign_medium: 
-campaign_keyword: 
+document_referrer:
+
+document_host:
+
+event_category:
+
+event_action:
+
+event_label:
+
+event_value:
+
+campaign_name:
+
+campaign_source:
+
+campaign_medium:
+
+campaign_keyword:
+
 campaign_content: 
 
 dimension_<1-200>: 
 
-*Untested* 
-user_screen_resolution: 
-user_viewport_size: 
+*Untested*
+
+user_screen_resolution:
+
+user_viewport_size:
+
 user_screen_colors: 
 
 
