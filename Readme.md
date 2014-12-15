@@ -25,7 +25,7 @@ gabba.page_view(request, "Page Title")
 
 ```
 
-Or if you want to get really fancy you can update the parameters for the page view only..
+Or if you want to get really fancy you can update the parameters for this page view only...
 ```ruby
 gabba.page_view(request, "Page Title", document_path: "/manually/fiddled/url")
 
@@ -136,7 +136,7 @@ campaign_keyword:
 
 campaign_content: 
 
-dimension_<1-200>: 
+dimension_[1-200]: 
 
 **Untested**
 
