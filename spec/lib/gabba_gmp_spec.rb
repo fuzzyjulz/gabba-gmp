@@ -1,5 +1,4 @@
 require 'spec_helper'
-require 'pry'
 
 describe GabbaGMP::GabbaGMP do
   describe "#initialize" do

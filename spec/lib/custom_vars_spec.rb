@@ -1,5 +1,4 @@
 require 'spec_helper'
-require 'pry'
 
 describe GabbaGMP::GabbaGMP::CustomVars do
   describe "#set_custom_var" do
