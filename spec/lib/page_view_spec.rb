@@ -13,16 +13,16 @@ describe GabbaGMP::GabbaGMP::PageView do
     
     it "#page_view(request)" do
       gabbaGmp.page_view(request)
-      expect_query(MockRequest::DEFAULT_PARAMS.merge({v: "1", dt: "", tid: "tracker", cid: "1234", t: "pageview", dp: ""}))
+      expect_query(MockRequest::DEFAULT_PARAMS.merge({v: "1", tid: "tracker", cid: "1234", t: "pageview"}))
 
       request.fullpath = "/amazing/things"
       gabbaGmp.page_view(request)
-      expect_query(MockRequest::DEFAULT_PARAMS.merge({v: "1", dt: "", tid: "tracker", cid: "1234", t: "pageview", dp: "/amazing/things"}))
+      expect_query(MockRequest::DEFAULT_PARAMS.merge({v: "1", tid: "tracker", cid: "1234", t: "pageview", dp: "/amazing/things"}))
     end
     
     it "#page_view(request, title)" do
       gabbaGmp.page_view(request, "Title")
-      expect_query(MockRequest::DEFAULT_PARAMS.merge({v: "1", dt: "Title", tid: "tracker", cid: "1234", t: "pageview", dp: ""}))
+      expect_query(MockRequest::DEFAULT_PARAMS.merge({v: "1", dt: "Title", tid: "tracker", cid: "1234", t: "pageview"}))
     end
     
     it "#page_view(request, title, options)" do
@@ -35,10 +35,10 @@ describe GabbaGMP::GabbaGMP::PageView do
       expect_query(MockRequest::DEFAULT_PARAMS.merge({v: "1", dt: "Title", tid: "tracker", cid: "1234", t: "pageview", dp: "/Nowhere"}))
 
       gabbaGmp.page_view(request)
-      expect_query(MockRequest::DEFAULT_PARAMS.merge({v: "1", dt: "", tid: "tracker", cid: "1234", t: "pageview", dp: ""}))
+      expect_query(MockRequest::DEFAULT_PARAMS.merge({v: "1", tid: "tracker", cid: "1234", t: "pageview"}))
 
       gabbaGmp.page_view(request, "Title", {user_language: "en-au"})
-      expect_query(MockRequest::DEFAULT_PARAMS.merge({v: "1", dt: "Title", tid: "tracker", cid: "1234", t: "pageview", ul: "en-au", dp: ""}))
+      expect_query(MockRequest::DEFAULT_PARAMS.merge({v: "1", dt: "Title", tid: "tracker", cid: "1234", t: "pageview", ul: "en-au"}))
     end
   end
 end

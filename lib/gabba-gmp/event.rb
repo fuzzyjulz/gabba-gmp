@@ -27,8 +27,8 @@ module GabbaGMP
           event_category: category,
           event_action: action
         }
-        options[:event_label] = label if label
-        options[:event_value] = value if value
+        options[:event_label] = label unless label.to_s.empty?
+        options[:event_value] = value unless value.to_s.empty?
         @sessionopts.merge(options).merge!(event_options)
       end
     end

@@ -11,8 +11,8 @@ def stub_analytics(expected_params)
   ).to_return(:status => 200, :body => '', :headers => {})
 end
 
-def expect_query(query_params)
-  expect(WebMock).to have_requested(:get, "www.google-analytics.com\/collect").with(:query => query_params)
+def expect_query(query_params, times = 1)
+  expect(WebMock).to have_requested(:get, "www.google-analytics.com\/collect").with(:query => query_params).times(times)
 end
 
 class MockCookies

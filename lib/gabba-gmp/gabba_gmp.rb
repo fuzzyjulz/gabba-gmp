@@ -4,6 +4,7 @@ require 'net/http'
 require 'ipaddr'
 require 'cgi'
 require 'net/http/persistent'
+require 'pry'
 
 require "#{File.dirname(__FILE__)}/parameter_map"
 require "#{File.dirname(__FILE__)}/campaign"
@@ -93,26 +94,30 @@ module GabbaGMP
       campaign ||= Campaign.new
       {}.tap do |campaign_params|
         if campaign.present?
-          @sessionopts[:campaign_name] = campaign.name
+          @sessionopts[:campaign_name] = parse_string(campaign.name)
           @sessionopts[:campaign_name] ||= "(direct)"
             
-          @sessionopts[:campaign_source] = campaign.source
+          @sessionopts[:campaign_source] = parse_string(campaign.source)
           @sessionopts[:campaign_source] ||= "(direct)"
             
-          @sessionopts[:campaign_medium] = campaign.medium
+          @sessionopts[:campaign_medium] = parse_string(campaign.medium)
           @sessionopts[:campaign_medium] ||= "(none)"
           
           @sessionopts.delete(:campaign_keyword)
-          @sessionopts[:campaign_keyword] = campaign.keyword if campaign.keyword
+          @sessionopts[:campaign_keyword] = campaign.keyword unless campaign.keyword.to_s.empty?
             
           @sessionopts.delete(:campaign_content)
-          @sessionopts[:campaign_content] = campaign.content if campaign.content
+          @sessionopts[:campaign_content] = campaign.content unless campaign.content.to_s.empty?
         end
       end
     end
     
     
     private
+    def parse_string(value)
+      (value.to_s.empty? ? nil : value)
+    end
+    
     # Sanity check that we have needed params to even call GA
     def validate_session_parameters(params)
       raise GoogleAnalyticsRequiredParameterMissingError, "Protocol version is required" unless params[:protocol_version]
@@ -128,7 +133,9 @@ module GabbaGMP
     # makes the tracking call to Google Analytics
     def hey(params)
       validate_session_parameters(params)
-      query = params.map {|k,v| "#{GA_PARAMS[k]}=#{URI.escape("#{v}", Regexp.new("[^#{URI::PATTERN::UNRESERVED}]"))}" }.join('&')
+      params_formatted = params.each_pair {|k,v| params[k] = "#{v}"}.keep_if {|k,v| !v.nil? and !v.empty?}
+      params_formatted = params_formatted.map {|k,v| "#{GA_PARAMS[k]}=#{URI.escape(v, Regexp.new("[^#{URI::PATTERN::UNRESERVED}]"))}" }
+      query = params_formatted.join('&')
 
       @http ||= Net::HTTP::Persistent.new 'GabbaGMP'
 

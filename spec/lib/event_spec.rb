@@ -15,12 +15,20 @@ describe GabbaGMP::GabbaGMP::Event do
       gabbaGmp.event("Cats", "Action")
       expect_query(MockRequest::DEFAULT_PARAMS.merge({v: "1", tid: "tracker", cid: "1234", t: "event", 
         ec: "Cats", ea: "Action"}))
+        
+      gabbaGmp.event("Cats", "Action","")
+      expect_query(MockRequest::DEFAULT_PARAMS.merge({v: "1", tid: "tracker", cid: "1234", t: "event", 
+        ec: "Cats", ea: "Action"}), 2)
     end
     
     it "#event(category, action, label)" do
       gabbaGmp.event("Cats", "Action", "Label")
       expect_query(MockRequest::DEFAULT_PARAMS.merge({v: "1", tid: "tracker", cid: "1234", t: "event", 
         ec: "Cats", ea: "Action", el: "Label"}))
+        
+      gabbaGmp.event("Cats", "Action", "Label", "")
+      expect_query(MockRequest::DEFAULT_PARAMS.merge({v: "1", tid: "tracker", cid: "1234", t: "event", 
+        ec: "Cats", ea: "Action", el: "Label"}), 2)
     end
 
     it "#event(category, action, label, value)" do

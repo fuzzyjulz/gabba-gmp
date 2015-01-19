@@ -56,6 +56,26 @@ describe GabbaGMP::GabbaGMP::Campaign do
     it "is not present?" do
       campaign = GabbaGMP::GabbaGMP::Campaign.new
       expect(campaign.present?).to be(false)
+
+      campaign = GabbaGMP::GabbaGMP::Campaign.new
+      campaign.name = ''
+      expect(campaign.present?).to be(false)
+
+      campaign = GabbaGMP::GabbaGMP::Campaign.new
+      campaign.source = ''
+      expect(campaign.present?).to be(false)
+      
+      campaign = GabbaGMP::GabbaGMP::Campaign.new
+      campaign.medium = ''
+      expect(campaign.present?).to be(false)
+
+      campaign = GabbaGMP::GabbaGMP::Campaign.new
+      campaign.keyword = ''
+      expect(campaign.present?).to be(false)
+
+      campaign = GabbaGMP::GabbaGMP::Campaign.new
+      campaign.content = ''
+      expect(campaign.present?).to be(false)
     end
   end
 end

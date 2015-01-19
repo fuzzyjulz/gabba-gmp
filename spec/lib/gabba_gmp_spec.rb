@@ -112,6 +112,18 @@ describe GabbaGMP::GabbaGMP do
       gabbaGmp.event("Cats", "Action")
       expect_query(MockRequest::DEFAULT_PARAMS.merge({v: "1", tid: "tracker", cid: "1234", t: "event", 
         ec: "Cats", ea: "Action", cn: "(direct)", cs: "Confidential", cm: "(none)", cc: "Contents"}))
+
+      campaign = GabbaGMP::GabbaGMP::Campaign.new()
+      campaign.name = "First Campaign"
+      campaign.source = ""
+      campaign.medium = ""
+      campaign.keyword = ""
+      campaign.content = ""
+      
+      gabbaGmp.campaign = campaign
+      gabbaGmp.event("Cats", "Action")
+      expect_query(MockRequest::DEFAULT_PARAMS.merge({v: "1", tid: "tracker", cid: "1234", t: "event", 
+        ec: "Cats", ea: "Action", cn: "First Campaign", cs: "(direct)", cm: "(none)"}))
     end
   end
   describe "#campaign=" do
