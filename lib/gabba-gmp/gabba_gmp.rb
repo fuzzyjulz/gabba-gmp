@@ -4,7 +4,6 @@ require 'net/http'
 require 'ipaddr'
 require 'cgi'
 require 'net/http/persistent'
-require 'pry'
 
 require "#{File.dirname(__FILE__)}/parameter_map"
 require "#{File.dirname(__FILE__)}/campaign"
