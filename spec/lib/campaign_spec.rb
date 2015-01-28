@@ -53,26 +53,36 @@ describe GabbaGMP::GabbaGMP::Campaign do
       expect(campaign.present?).to be(true)
     end
 
-    it "is not present?" do
+    it "is not present? - no campaign" do
       campaign = GabbaGMP::GabbaGMP::Campaign.new
       expect(campaign.present?).to be(false)
+    end
 
+    it "is not present? - blank name" do
       campaign = GabbaGMP::GabbaGMP::Campaign.new
       campaign.name = ''
       expect(campaign.present?).to be(false)
+    end
 
+    it "is not present? - blank source" do
       campaign = GabbaGMP::GabbaGMP::Campaign.new
       campaign.source = ''
       expect(campaign.present?).to be(false)
-      
+    end
+
+    it "is not present? - blank medium" do
       campaign = GabbaGMP::GabbaGMP::Campaign.new
       campaign.medium = ''
       expect(campaign.present?).to be(false)
+    end
 
+    it "is not present? - blank keyword" do
       campaign = GabbaGMP::GabbaGMP::Campaign.new
       campaign.keyword = ''
       expect(campaign.present?).to be(false)
+    end
 
+    it "is not present? - blank content" do
       campaign = GabbaGMP::GabbaGMP::Campaign.new
       campaign.content = ''
       expect(campaign.present?).to be(false)

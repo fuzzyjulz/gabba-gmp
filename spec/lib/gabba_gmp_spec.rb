@@ -25,13 +25,15 @@ describe GabbaGMP::GabbaGMP do
         ec: "Cats", ea: "Action", ul: "da"}))
     end
     
-    it "#initialize referrer" do
+    it "#initialize referrer - referrer from localhost" do
       request.referrer = "http://www.example.com/my-pages"
       gabba = GabbaGMP::GabbaGMP.new("tracker123", request, cookies)
       gabba.event("Cats", "Action")
       expect_query(MockRequest::DEFAULT_PARAMS.merge({v: "1", tid: "tracker123", cid: "1234", t: "event", 
         ec: "Cats", ea: "Action"}))
-
+    end
+    
+    it "#initialize referrer - referrer from another site" do
       request.referrer = "http://www.otherexample.com/my-pages"
       gabba = GabbaGMP::GabbaGMP.new("tracker123", request, cookies)
       gabba.event("Cats", "Action")
@@ -60,11 +62,13 @@ describe GabbaGMP::GabbaGMP do
       expect_query(MockRequest::DEFAULT_PARAMS.merge({v: "1", tid: "tracker", cid: "1234", t: "event", 
         ec: "Cats", ea: "Action", ul: "en-gb"}))
         
+      #Add in some more parameters - Dimensions
       gabbaGmp.add_options(dimension_1: "X", dimension_2: "Y", dimension_3: "Z")
       gabbaGmp.event("Cats", "Action")
       expect_query(MockRequest::DEFAULT_PARAMS.merge({v: "1", tid: "tracker", cid: "1234", t: "event", 
         ec: "Cats", ea: "Action", ul: "en-gb", cd1: "X", cd2: "Y", cd3: "Z"}))
 
+      #Add in custom dimensions to make sure it works the same way.
       gabbaGmp.set_custom_var(3, "Other Dimensions", "Time")
       gabbaGmp.event("Cats", "Action")
       expect_query(MockRequest::DEFAULT_PARAMS.merge({v: "1", tid: "tracker", cid: "1234", t: "event", 
@@ -78,7 +82,7 @@ describe GabbaGMP::GabbaGMP do
     before do
       stub_analytics("")
     end
-    it "#add_options(options)" do
+    it "#campaign=" do
       campaign = GabbaGMP::GabbaGMP::Campaign.new()
       campaign.name = "First Campaign"
       campaign.source = "Bottle"
@@ -86,16 +90,20 @@ describe GabbaGMP::GabbaGMP do
       campaign.keyword = "Ring"
       campaign.content = "Campaigns"
       
+      #Use the campaign
       gabbaGmp.campaign = campaign
       gabbaGmp.event("Cats1", "Action")
       expect_query(MockRequest::DEFAULT_PARAMS.merge({v: "1", tid: "tracker", cid: "1234", t: "event", 
         ec: "Cats1", ea: "Action", cn: "First Campaign", cs: "Bottle", cm: "Spiritual", ck: "Ring", cc: "Campaigns"}))
 
+      #Reset the campaign to nothing
       gabbaGmp.campaign = nil
       gabbaGmp.event("Cats2", "Action")
       expect_query(MockRequest::DEFAULT_PARAMS.merge({v: "1", tid: "tracker", cid: "1234", t: "event", 
         ec: "Cats2", ea: "Action", cn: "First Campaign", cs: "Bottle", cm: "Spiritual", ck: "Ring", cc: "Campaigns"}))
+    end
 
+    it "#campaign= - Only keyword set" do
       campaign = GabbaGMP::GabbaGMP::Campaign.new()
       campaign.keyword = "Rings"
       
@@ -103,7 +111,9 @@ describe GabbaGMP::GabbaGMP do
       gabbaGmp.event("Cats", "Action")
       expect_query(MockRequest::DEFAULT_PARAMS.merge({v: "1", tid: "tracker", cid: "1234", t: "event", 
         ec: "Cats", ea: "Action", cn: "(direct)", cs: "(direct)", cm: "(none)", ck: "Rings"}))
-        
+    end
+    
+    it "#campaign= - content and source set" do
       campaign = GabbaGMP::GabbaGMP::Campaign.new()
       campaign.content = "Contents"
       campaign.source = "Confidential"
@@ -112,7 +122,9 @@ describe GabbaGMP::GabbaGMP do
       gabbaGmp.event("Cats", "Action")
       expect_query(MockRequest::DEFAULT_PARAMS.merge({v: "1", tid: "tracker", cid: "1234", t: "event", 
         ec: "Cats", ea: "Action", cn: "(direct)", cs: "Confidential", cm: "(none)", cc: "Contents"}))
-
+    end
+    
+    it "#campaign= - Empty variables set" do
       campaign = GabbaGMP::GabbaGMP::Campaign.new()
       campaign.name = "First Campaign"
       campaign.source = ""
@@ -126,7 +138,8 @@ describe GabbaGMP::GabbaGMP do
         ec: "Cats", ea: "Action", cn: "First Campaign", cs: "(direct)", cm: "(none)"}))
     end
   end
-  describe "#campaign=" do
+  
+  describe "#logger=" do
     let(:request) {MockRequest.new}
     let(:cookies) {MockCookies.new(utm_visitor_uuid: 1234)}
     let(:gabbaGmp) { GabbaGMP::GabbaGMP.new("tracker", request, cookies)}

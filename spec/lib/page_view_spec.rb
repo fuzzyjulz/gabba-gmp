@@ -11,10 +11,12 @@ describe GabbaGMP::GabbaGMP::PageView do
     
     #request, title = nil, options = {}
     
-    it "#page_view(request)" do
+    it "#page_view(request) - with blank path" do
       gabbaGmp.page_view(request)
       expect_query(MockRequest::DEFAULT_PARAMS.merge({v: "1", tid: "tracker", cid: "1234", t: "pageview"}))
-
+    end
+    
+    it "#page_view(request) - with path" do
       request.fullpath = "/amazing/things"
       gabbaGmp.page_view(request)
       expect_query(MockRequest::DEFAULT_PARAMS.merge({v: "1", tid: "tracker", cid: "1234", t: "pageview", dp: "/amazing/things"}))
@@ -30,7 +32,7 @@ describe GabbaGMP::GabbaGMP::PageView do
       expect_query(MockRequest::DEFAULT_PARAMS.merge({v: "1", dt: "Title", tid: "tracker", cid: "1234", t: "pageview", dp: "/Nowhere"}))
     end
     
-    it "must not interfere with other calls if using options" do
+    it "#pageview calls must not interfere with each other" do
       gabbaGmp.page_view(request, "Title", {document_path: "/Nowhere"})
       expect_query(MockRequest::DEFAULT_PARAMS.merge({v: "1", dt: "Title", tid: "tracker", cid: "1234", t: "pageview", dp: "/Nowhere"}))
 

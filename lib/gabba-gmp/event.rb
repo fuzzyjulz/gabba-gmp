@@ -15,7 +15,7 @@ module GabbaGMP
       #   g.event("Videos", "Play", "ID", "123")
       #
       def event(category, action, label = nil, value = nil, options = {})
-        hey(event_params(category, action, label, value, options))
+        send(event_params(category, action, label, value, options))
       end
 
       private

@@ -130,7 +130,7 @@ module GabbaGMP
     end
 
     # makes the tracking call to Google Analytics
-    def hey(params)
+    def send(params)
       validate_session_parameters(params)
       params_formatted = params.each_pair {|k,v| params[k] = "#{v}"}.keep_if {|k,v| !v.nil? and !v.empty?}
       params_formatted = params_formatted.map {|k,v| "#{GA_PARAMS[k]}=#{URI.escape(v, Regexp.new("[^#{URI::PATTERN::UNRESERVED}]"))}" }

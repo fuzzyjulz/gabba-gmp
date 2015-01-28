@@ -13,7 +13,7 @@ module GabbaGMP
       #
       def page_view(request, title = nil, options = {})
         
-        hey(page_view_params(title, request.fullpath, options))
+        send(page_view_params(title, request.fullpath, options))
       end
 
       private

@@ -15,20 +15,24 @@ describe GabbaGMP::GabbaGMP::Event do
       gabbaGmp.event("Cats", "Action")
       expect_query(MockRequest::DEFAULT_PARAMS.merge({v: "1", tid: "tracker", cid: "1234", t: "event", 
         ec: "Cats", ea: "Action"}))
-        
+    end
+    
+    it "#event(category, action, label) - Handles blank labels" do
       gabbaGmp.event("Cats", "Action","")
       expect_query(MockRequest::DEFAULT_PARAMS.merge({v: "1", tid: "tracker", cid: "1234", t: "event", 
-        ec: "Cats", ea: "Action"}), 2)
+        ec: "Cats", ea: "Action"}))
     end
     
     it "#event(category, action, label)" do
       gabbaGmp.event("Cats", "Action", "Label")
       expect_query(MockRequest::DEFAULT_PARAMS.merge({v: "1", tid: "tracker", cid: "1234", t: "event", 
         ec: "Cats", ea: "Action", el: "Label"}))
-        
+    end
+    
+     it "#event(category, action, label, value) - Handles blank values" do
       gabbaGmp.event("Cats", "Action", "Label", "")
       expect_query(MockRequest::DEFAULT_PARAMS.merge({v: "1", tid: "tracker", cid: "1234", t: "event", 
-        ec: "Cats", ea: "Action", el: "Label"}), 2)
+        ec: "Cats", ea: "Action", el: "Label"}))
     end
 
     it "#event(category, action, label, value)" do
@@ -43,7 +47,7 @@ describe GabbaGMP::GabbaGMP::Event do
         ec: "Cats", ea: "Action", el: "Label", ev: "Value", ul: "en-au"}))
     end
     
-    it "must not interfere with other calls if using options" do
+    it "#event Calls must not interfere with each other" do
       gabbaGmp.event("Cats", "Action", "Label", "Value", user_language: "en-au")
       expect_query(MockRequest::DEFAULT_PARAMS.merge({v: "1", tid: "tracker", cid: "1234", t: "event", 
         ec: "Cats", ea: "Action", el: "Label", ev: "Value", ul: "en-au"}))
